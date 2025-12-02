@@ -29,56 +29,26 @@ echo -e '{\n  "log-driver": "journald"\n}' >/etc/docker/daemon.json
 $STD sh <(curl -fsSL https://get.docker.com)
 msg_ok "Installed Docker $DOCKER_LATEST_VERSION"
 
-read -r -p "${TAB3}Install Docker Compose v2 plugin? <y/N> " prompt_compose
-if [[ ${prompt_compose,,} =~ ^(y|yes)$ ]]; then
-  msg_info "Installing Docker Compose $DOCKER_COMPOSE_LATEST_VERSION"
-  mkdir -p /usr/local/lib/docker/cli-plugins
-  curl -fsSL "https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_LATEST_VERSION}/docker-compose-$(uname -s)-$(uname -m)" \
-    -o /usr/local/lib/docker/cli-plugins/docker-compose
-  chmod +x /usr/local/lib/docker/cli-plugins/docker-compose
-  msg_ok "Installed Docker Compose $DOCKER_COMPOSE_LATEST_VERSION"
-fi
 
-read -r -p "${TAB3}Would you like to add Portainer (UI)? <y/N> " prompt
-if [[ ${prompt,,} =~ ^(y|yes)$ ]]; then
-  msg_info "Installing Portainer $PORTAINER_LATEST_VERSION"
-  docker volume create portainer_data >/dev/null
-  $STD docker run -d \
-    -p 8000:8000 \
-    -p 9443:9443 \
-    --name=portainer \
-    --restart=always \
-    -v /var/run/docker.sock:/var/run/docker.sock \
-    -v portainer_data:/data \
-    portainer/portainer-ce:latest
-  msg_ok "Installed Portainer $PORTAINER_LATEST_VERSION"
-else
-  read -r -p "${TAB3}Would you like to install the Portainer Agent (for remote management)? <y/N> " prompt_agent
-  if [[ ${prompt_agent,,} =~ ^(y|yes)$ ]]; then
-    msg_info "Installing Portainer Agent $PORTAINER_AGENT_LATEST_VERSION"
-    $STD docker run -d \
-      -p 9001:9001 \
-      --name portainer_agent \
-      --restart=always \
-      -v /var/run/docker.sock:/var/run/docker.sock \
-      -v /var/lib/docker/volumes:/var/lib/docker/volumes \
-      portainer/agent
-    msg_ok "Installed Portainer Agent $PORTAINER_AGENT_LATEST_VERSION"
-  fi
-fi
+msg_info "Installing Docker Compose $DOCKER_COMPOSE_LATEST_VERSION"
+mkdir -p /usr/local/lib/docker/cli-plugins
+curl -fsSL "https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_LATEST_VERSION}/docker-compose-$(uname -s)-$(uname -m)" \
+  -o /usr/local/lib/docker/cli-plugins/docker-compose
+chmod +x /usr/local/lib/docker/cli-plugins/docker-compose
+msg_ok "Installed Docker Compose $DOCKER_COMPOSE_LATEST_VERSION"
 
-read -r -p "${TAB3}Expose Docker TCP socket (insecure) ? [n = No, l = Local only (127.0.0.1), a = All interfaces (0.0.0.0)] <n/l/a>: " socket_choice
-case "${socket_choice,,}" in
-l)
-  socket="tcp://127.0.0.1:2375"
-  ;;
-a)
-  socket="tcp://0.0.0.0:2375"
-  ;;
-*)
-  socket=""
-  ;;
-esac
+msg_info "Installing Portainer $PORTAINER_LATEST_VERSION"
+docker volume create portainer_data >/dev/null
+$STD docker run -d \
+  -p 8000:8000 \
+  -p 9443:9443 \
+  --name=portainer \
+  --restart=always \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  -v portainer_data:/data \
+  portainer/portainer-ce:latest
+msg_ok "Installed Portainer $PORTAINER_LATEST_VERSION"
+socket="tcp://127.0.0.1:2375"
 
 if [[ -n "$socket" ]]; then
   msg_info "Enabling Docker TCP socket on $socket"
