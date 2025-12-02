@@ -187,7 +187,7 @@ update_motd_ip() {
 
 # This function checks if the script is running through SSH and prompts the user to confirm if they want to proceed or exit.
 ssh_check() {
-  msg_info "bypassing SSH check from Community-Scripts"
+  msg_ok "bypassing SSH check from Community-Scripts"
 }
 
 base_settings() {
