@@ -8,8 +8,6 @@
 # This sets verbose mode if the global variable is set to "yes"
 # if [ "$VERBOSE" == "yes" ]; then set -x; fi
 
-source <(curl -fsSL https://raw.githubusercontent.com/Teh-STIG/ProxmoxVE/main/docker.conf)
-
 if command -v curl >/dev/null 2>&1; then
   source <(curl -fsSL https://raw.githubusercontent.com/community-scripts/ProxmoxVE/main/misc/core.func)
   load_functions
@@ -19,6 +17,8 @@ elif command -v wget >/dev/null 2>&1; then
   load_functions
   #echo "(create-lxc.sh) Loaded core.func via wget"
 fi
+
+source <(curl -fsSL https://raw.githubusercontent.com/Teh-STIG/ProxmoxVE/main/docker.conf)
 
 # This sets error handling options and defines the error_handler function to handle errors
 set -Eeuo pipefail
@@ -109,9 +109,9 @@ function select_storage() {
   esac
 
   # Check for preset STORAGE variable
-  if [ "$CONTENT" = "rootdir" ] && [ -n "${CONTAINER_STORAGE:-}" ]; then
+  if [ "$CONTENT" = "rootdir" ] && [ -n "${STORAGE:-}" ]; then
     if pvesm status -content "$CONTENT" | awk 'NR>1 {print $1}' | grep -qx "$STORAGE"; then
-      STORAGE_RESULT="$CONTAINER_STORAGE"
+      STORAGE_RESULT="$STORAGE"
       msg_info "Using preset storage: $STORAGE_RESULT for $CONTENT_LABEL"
       return 0
     else
