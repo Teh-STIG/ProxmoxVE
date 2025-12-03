@@ -958,7 +958,7 @@ install_script() {
       header_info
       echo -e "${INFO}${HOLD} ${GN}Using Config File on node $PVEHOST_NAME${CL}"
       METHOD="config_file"
-      source <(curl -fsSL https://raw.githubusercontent.com/community-scripts/ProxmoxVE/main/misc/config-file.func)
+      source <(curl -fsSL https://raw.githubusercontent.com/Teh-STIG/ProxmoxVE/main/misc/config-file.func)
       config_file
       break
       ;;
