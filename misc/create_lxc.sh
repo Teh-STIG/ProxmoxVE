@@ -8,6 +8,8 @@
 # This sets verbose mode if the global variable is set to "yes"
 # if [ "$VERBOSE" == "yes" ]; then set -x; fi
 
+source "/opt/community-scripts/${NSAPP}.conf"
+
 if command -v curl >/dev/null 2>&1; then
   source <(curl -fsSL https://raw.githubusercontent.com/community-scripts/ProxmoxVE/main/misc/core.func)
   load_functions
@@ -107,9 +109,9 @@ function select_storage() {
   esac
 
   # Check for preset STORAGE variable
-  if [ "$CONTENT" = "rootdir" ] && [ -n "${STORAGE:-}" ]; then
+  if [ "$CONTENT" = "rootdir" ] && [ -n "${CONTAINER_STORAGE:-}" ]; then
     if pvesm status -content "$CONTENT" | awk 'NR>1 {print $1}' | grep -qx "$STORAGE"; then
-      STORAGE_RESULT="$STORAGE"
+      STORAGE_RESULT="$CONTAINER_STORAGE"
       msg_info "Using preset storage: $STORAGE_RESULT for $CONTENT_LABEL"
       return 0
     else
@@ -146,7 +148,7 @@ function select_storage() {
   fi
 
   local WIDTH=$((COL_WIDTH + 42))
-  :' 
+
   while true; do
     local DISPLAY_SELECTED
     DISPLAY_SELECTED=$(whiptail --backtitle "Proxmox VE Helper Scripts" \
@@ -174,19 +176,7 @@ function select_storage() {
     done
     return 0
   done
-  '
-  echo -e "Container Storage Variable: $CONTAINER_STORAGE "
-  DISPLAY_SELECTED="local-lvm"
-  STORAGE_RESULT="${STORAGE_MAP[$DISPLAY_SELECTED]}"
-  for ((i = 0; i < ${#MENU[@]}; i += 3)); do
-      if [[ "${MENU[$i]}" == "$DISPLAY_SELECTED" ]]; then
-        STORAGE_INFO="${MENU[$i + 1]}"
-        break
-      fi
-  done
-  
-  
-}
+ }
 
 # Test if required variables are set
 [[ "${CTID:-}" ]] || {
@@ -233,7 +223,6 @@ done
 
 while true; do
   if select_storage container; then
-    msg_ok "Selected $STORAGE_RESULT"
     CONTAINER_STORAGE="$STORAGE_RESULT"
     CONTAINER_STORAGE_INFO="$STORAGE_INFO"
     msg_ok "Storage ${BL}$CONTAINER_STORAGE${CL} [Container]"
