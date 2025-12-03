@@ -149,13 +149,11 @@ function select_storage() {
 
   while true; do
     local DISPLAY_SELECTED
-    :'
     DISPLAY_SELECTED=$(whiptail --backtitle "Proxmox VE Helper Scripts" \
       --title "Storage Pools" \
       --radiolist "Which storage pool for ${CONTENT_LABEL,,}?\n(Spacebar to select)" \
       16 "$WIDTH" 6 "${MENU[@]}" 3>&1 1>&2 2>&3)
-    '
-    DISPLAY_SELECTED="local-lvm"
+     
     # Cancel or ESC
     [[ $? -ne 0 ]] && exit_script
 
@@ -176,8 +174,8 @@ function select_storage() {
     done
     return 0
   done
-  
-  echo -e $STORAGE_RESULT
+  echo -e $DISPLAY_SELECT
+  echo -e ${STORAGE_MAP[$DISPLAY_SELECTED]}
 }
 
 # Test if required variables are set
