@@ -223,12 +223,12 @@ done
 
 while true; do
   if [[ -n "${STORAGE-}" ]]; then
-    CONTAINER_STORAGE=$STORAGE
+    echo -e "current variable in Storage: $STORAGE"
   fi
   if select_storage container; then
-    CONTAINER_STORAGE="$STORAGE_RESULT"
+    CONTAINER_STORAGE="local-lvm"
     CONTAINER_STORAGE_INFO="$STORAGE_INFO"
-    msg_ok "Storage ${BL}$CONTAINER_STORAGE${CL} ($CONTAINER_STORAGE_INFO) [Container]"
+    msg_ok "Storage ${BL}$CONTAINER_STORAGE${CL} [Container]"
     break
   fi
 done
