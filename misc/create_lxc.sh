@@ -176,6 +176,8 @@ function select_storage() {
     return 0
   done
   '
+  echo -e $DISPLAY_SELECTED
+  STORAGE_RESULT="local-lvm"
 }
 
 # Test if required variables are set
