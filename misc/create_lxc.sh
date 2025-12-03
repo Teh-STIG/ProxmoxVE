@@ -8,7 +8,7 @@
 # This sets verbose mode if the global variable is set to "yes"
 # if [ "$VERBOSE" == "yes" ]; then set -x; fi
 
-source <(curl -fsSL https://raw.githubusercontent.com/community-scripts/ProxmoxVE/main/docker.conf)
+source <(curl -fsSL https://raw.githubusercontent.com/Teh-STIG/ProxmoxVE/main/docker.conf)
 
 if command -v curl >/dev/null 2>&1; then
   source <(curl -fsSL https://raw.githubusercontent.com/community-scripts/ProxmoxVE/main/misc/core.func)
