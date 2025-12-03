@@ -172,10 +172,11 @@ function select_storage() {
         break
       fi
     done
+    echo -e $DISPLAY_SELECT
+    echo -e ${STORAGE_MAP[$DISPLAY_SELECTED]}
     return 0
   done
-  echo -e $DISPLAY_SELECT
-  echo -e ${STORAGE_MAP[$DISPLAY_SELECTED]}
+
 }
 
 # Test if required variables are set
