@@ -14,6 +14,8 @@ var_os="${var_os:-debian}"
 var_version="${var_version:-12}"
 var_unprivileged="${var_unprivileged:-1}"
 var_container_storage="${var_container_storage:-local-lvm}"
+var_storage="${var_storage:-local-lvm}"
+storage="${storage:-local-lvm}"
 
 header_info "$APP"
 variables
