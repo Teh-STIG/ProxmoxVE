@@ -905,7 +905,9 @@ install_script() {
     timezone=$(timedatectl show --value --property=Timezone 2>/dev/null || echo "UTC")
   fi
   header_info
-  while true; do
+ # The following block is commented out to force using a Config File
+ : << 'COMMENT' 
+ while true; do
 
     TMP_CHOICE=$(whiptail --backtitle "Proxmox VE Helper Scripts" \
       --title "SETTINGS" \
@@ -987,6 +989,14 @@ install_script() {
       ;;
     esac
   done
+  COMMENT
+
+  header_info
+  echo -e "${INFO}${HOLD} ${GN}Using Config File on node $PVEHOST_NAME${CL}"
+  METHOD="config_file"
+  source <(curl -fsSL https://raw.githubusercontent.com/community-scripts/ProxmoxVE/main/misc/config-file.func)
+  config_file
+  break
 }
 
 check_container_resources() {
