@@ -18,6 +18,6 @@ var_fuse=1 \
 var_nesting=1 \
 var_container_storage=local-lvm \
 var_template_storage=local \
-bash -c "$(curl -fsSL https://raw.githubusercontent.com/community-scripts/ProxmoxVE/main/ct/docker.sh)"
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/community-scripts/ProxmoxVED/main/ct/docker.sh)"
 
 echo "✓ Container deployed successfully"
