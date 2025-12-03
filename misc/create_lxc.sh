@@ -147,14 +147,15 @@ function select_storage() {
 
   local WIDTH=$((COL_WIDTH + 42))
 
-  : '
   while true; do
     local DISPLAY_SELECTED
+    :'
     DISPLAY_SELECTED=$(whiptail --backtitle "Proxmox VE Helper Scripts" \
       --title "Storage Pools" \
       --radiolist "Which storage pool for ${CONTENT_LABEL,,}?\n(Spacebar to select)" \
       16 "$WIDTH" 6 "${MENU[@]}" 3>&1 1>&2 2>&3)
-
+    '
+    DISPLAY_SELECTED="local-lvm"
     # Cancel or ESC
     [[ $? -ne 0 ]] && exit_script
 
@@ -175,9 +176,8 @@ function select_storage() {
     done
     return 0
   done
-  '
-  echo -e $DISPLAY_SELECTED
-  STORAGE_RESULT="local-lvm"
+  
+  echo -e $STORAGE_RESULT
 }
 
 # Test if required variables are set
