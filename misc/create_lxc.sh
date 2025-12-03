@@ -146,6 +146,7 @@ function select_storage() {
   fi
 
   local WIDTH=$((COL_WIDTH + 42))
+  
   while true; do
     local DISPLAY_SELECTED
     DISPLAY_SELECTED=$(whiptail --backtitle "Proxmox VE Helper Scripts" \
@@ -173,6 +174,9 @@ function select_storage() {
     done
     return 0
   done
+  echo $STORAGE_INFO
+  exit 0
+  
 }
 
 # Test if required variables are set
