@@ -906,7 +906,7 @@ install_script() {
   fi
   header_info
  # The following block is commented out to force using a Config File
- : <<'COMMENT'
+ : '
  while true; do
 
     TMP_CHOICE=$(whiptail --backtitle "Proxmox VE Helper Scripts" \
@@ -989,7 +989,7 @@ install_script() {
       ;;
     esac
   done
-  COMMENT
+  '
 
   header_info
   echo -e "${INFO}${HOLD} ${GN}Using Config File on node $PVEHOST_NAME${CL}"
