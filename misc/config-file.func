@@ -693,6 +693,7 @@ config_file() {
   '
   if [[ -n "${STORAGE-}" ]]; then
     echo -e "${DISKSIZE}${BOLD}${DGN}Storage: ${BGN}$STORAGE${CL}"
+    STORAGE="local-lvm"
   else
     if CT_NAME=$(whiptail --backtitle "Proxmox VE Helper Scripts" --inputbox "Set Storage" 8 58 "$STORAGE" --title "STORAGE" 3>&1 1>&2 2>&3); then
       if [ -z "$CT_NAME" ]; then
