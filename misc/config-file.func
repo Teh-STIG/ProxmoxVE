@@ -691,17 +691,16 @@ config_file() {
     config_file
   fi
   '
-  if [[ -n "${STORAGE-}" ]]; then
-    echo -e "${DISKSIZE}${BOLD}${DGN}Storage: ${BGN}$STORAGE${CL}"
-    STORAGE="local-lvm"
+  if [[ -n "${CONTAINER_STORAGE-}" ]]; then
+    echo -e "${DISKSIZE}${BOLD}${DGN}Container Storage: ${BGN}$CONTAINER_STORAGE${CL}"
   else
-    if CT_NAME=$(whiptail --backtitle "Proxmox VE Helper Scripts" --inputbox "Set Storage" 8 58 "$STORAGE" --title "STORAGE" 3>&1 1>&2 2>&3); then
-      if [ -z "$CT_NAME" ]; then
-        STORAGE="local"
+    if CONTAINER_STORAGE=$(whiptail --backtitle "Proxmox VE Helper Scripts" --inputbox "Set Container Storage" 8 58 "$CONTAINER_STORAGE" --title "STORAGE" 3>&1 1>&2 2>&3); then
+      if [ -z "$CONTAINER_STORAGE" ]; then
+        CONTAINER_STORAGE="local"
       else
-        STORAGE=$(echo "${STORAGE}" | tr -d ' ')
+        CONTAINER_STORAGE=$(echo "${CONTAINER_STORAGE}" | tr -d ' ')
       fi
-      echo -e "${DISKSIZE}${BOLD}${DGN}Storage: ${BGN}$STORAGE${CL}"
+      echo -e "${DISKSIZE}${BOLD}${DGN}Storage: ${BGN}$CONTAINER_STORAGE${CL}"
     else
       exit_script
     fi
