@@ -12,7 +12,6 @@ var_hostname=ossiem \
 var_timezone=America/Chicago \
 var_pw=SecurePass123 \
 var_tags=community-script,docker,cyber-range,ossiem \
-var_verbose=yes \
 var_ssh=yes \
 var_fuse=1 \
 var_nesting=1 \
