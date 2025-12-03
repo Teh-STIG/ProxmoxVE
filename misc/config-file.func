@@ -681,7 +681,7 @@ config_file() {
     fi
     echo -e "${SEARCH}${BOLD}${DGN}Verbose Mode: ${BGN}$VERBOSE${CL}"
   fi
-
+: '
   if (whiptail --backtitle "Proxmox VE Helper Scripts" --title "ADVANCED SETTINGS WITH CONFIG FILE COMPLETE" --yesno "Ready to create ${APP} LXC?" 10 58); then
     echo -e "${CREATING}${BOLD}${RD}Creating a ${APP} LXC using the above settings${CL}"
   else
@@ -690,4 +690,6 @@ config_file() {
     echo -e "${INFO}${HOLD} ${GN}Using Config File on node $PVEHOST_NAME${CL}"
     config_file
   fi
+  '
+  echo -e "${CREATING}${BOLD}${RD}Creating a ${APP} LXC using the above settings${CL}"
 }
