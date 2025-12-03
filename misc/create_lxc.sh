@@ -146,7 +146,7 @@ function select_storage() {
   fi
 
   local WIDTH=$((COL_WIDTH + 42))
-
+  :' 
   while true; do
     local DISPLAY_SELECTED
     DISPLAY_SELECTED=$(whiptail --backtitle "Proxmox VE Helper Scripts" \
@@ -164,7 +164,7 @@ function select_storage() {
       whiptail --msgbox "No valid storage selected. Please try again." 8 58
       continue
     fi
-
+    
     STORAGE_RESULT="${STORAGE_MAP[$DISPLAY_SELECTED]}"
     for ((i = 0; i < ${#MENU[@]}; i += 3)); do
       if [[ "${MENU[$i]}" == "$DISPLAY_SELECTED" ]]; then
@@ -172,11 +172,20 @@ function select_storage() {
         break
       fi
     done
-    echo -e $DISPLAY_SELECT
-    echo -e ${STORAGE_MAP[$DISPLAY_SELECTED]}
     return 0
   done
-
+  '
+  echo -e "Container Storage Variable: $CONTAINER_STORAGE "
+  DISPLAY_SELECTED="local-lvm"
+  STORAGE_RESULT="${STORAGE_MAP[$DISPLAY_SELECTED]}"
+  for ((i = 0; i < ${#MENU[@]}; i += 3)); do
+      if [[ "${MENU[$i]}" == "$DISPLAY_SELECTED" ]]; then
+        STORAGE_INFO="${MENU[$i + 1]}"
+        break
+      fi
+  done
+  
+  
 }
 
 # Test if required variables are set
@@ -223,11 +232,9 @@ while true; do
 done
 
 while true; do
-  if [[ -n "${STORAGE-}" ]]; then
-    echo -e "current variable in Storage: $STORAGE"
-  fi
   if select_storage container; then
-    CONTAINER_STORAGE="local-lvm"
+    msg_ok "Selected $STORAGE_RESULT"
+    CONTAINER_STORAGE="$STORAGE_RESULT"
     CONTAINER_STORAGE_INFO="$STORAGE_INFO"
     msg_ok "Storage ${BL}$CONTAINER_STORAGE${CL} [Container]"
     break
