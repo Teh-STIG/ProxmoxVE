@@ -692,7 +692,7 @@ config_file() {
   fi
   '
   if [[ -n "${STORAGE-}" ]]; then
-    echo -e "${STORAGE}${BOLD}${DGN}Storage: ${BGN}$STORAGE${CL}"
+    echo -e "${DISKSIZE}${BOLD}${DGN}Storage: ${BGN}$STORAGE${CL}"
   else
     if CT_NAME=$(whiptail --backtitle "Proxmox VE Helper Scripts" --inputbox "Set Storage" 8 58 "$STORAGE" --title "STORAGE" 3>&1 1>&2 2>&3); then
       if [ -z "$CT_NAME" ]; then
@@ -700,7 +700,7 @@ config_file() {
       else
         STORAGE=$(echo "${STORAGE}" | tr -d ' ')
       fi
-      echo -e "${STORAGE}${BOLD}${DGN}Storage: ${BGN}$STORAGE${CL}"
+      echo -e "${DISKSIZE}${BOLD}${DGN}Storage: ${BGN}$STORAGE${CL}"
     else
       exit_script
     fi
