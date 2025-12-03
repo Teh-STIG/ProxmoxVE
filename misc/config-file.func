@@ -690,22 +690,7 @@ config_file() {
     echo -e "${INFO}${HOLD} ${GN}Using Config File on node $PVEHOST_NAME${CL}"
     config_file
   fi
-  '
-  if [[ -n "${CONTAINER_STORAGE-}" ]]; then
-    echo -e "${DISKSIZE}${BOLD}${DGN}Container Storage: ${BGN}$CONTAINER_STORAGE${CL}"
-  else
-    if CONTAINER_STORAGE=$(whiptail --backtitle "Proxmox VE Helper Scripts" --inputbox "Set Container Storage" 8 58 "$CONTAINER_STORAGE" --title "STORAGE" 3>&1 1>&2 2>&3); then
-      if [ -z "$CONTAINER_STORAGE" ]; then
-        CONTAINER_STORAGE="local"
-      else
-        CONTAINER_STORAGE=$(echo "${CONTAINER_STORAGE}" | tr -d ' ')
-      fi
-      echo -e "${DISKSIZE}${BOLD}${DGN}Storage: ${BGN}$CONTAINER_STORAGE${CL}"
-    else
-      exit_script
-    fi
-  fi
-  
+  ' 
   echo -e "${CREATING}${BOLD}${RD}Creating a ${APP} LXC using the above settings${CL}"
 
 }
