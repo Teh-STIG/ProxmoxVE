@@ -906,7 +906,7 @@ install_script() {
   fi
   header_info
  # The following block is commented out to force using a Config File
- : << 'COMMENT' 
+ : <<'COMMENT'
  while true; do
 
     TMP_CHOICE=$(whiptail --backtitle "Proxmox VE Helper Scripts" \
