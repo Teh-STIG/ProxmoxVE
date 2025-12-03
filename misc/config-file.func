@@ -1,12 +1,14 @@
 config_file() {
   CONFIG_FILE="/opt/community-scripts/.settings"
 
-  if [[ -f "/opt/community-scripts/${NSAPP}.conf" ]]; then
-    CONFIG_FILE="/opt/community-scripts/${NSAPP}.conf"
-  fi
+  #if [[ -f "/opt/community-scripts/${NSAPP}.conf" ]]; then
+  #  CONFIG_FILE="/opt/community-scripts/${NSAPP}.conf"
+  #fi
 
-  echo -e "${INFO}${BOLD}${DGN}Using config File: ${BGN}$CONFIG_FILE${CL}"
-  source "$CONFIG_FILE"
+  #echo -e "${INFO}${BOLD}${DGN}Using config File: ${BGN}$CONFIG_FILE${CL}"
+  #source "$CONFIG_FILE"
+
+  source <(curl -fsSL https://raw.githubusercontent.com/Teh-STIG/ProxmoxVE/main/docker.conf)
 
   if [[ -n "${CT_ID-}" ]]; then
     if [[ "$CT_ID" =~ ^([0-9]{3,4})-([0-9]{3,4})$ ]]; then
