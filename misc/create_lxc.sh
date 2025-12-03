@@ -107,8 +107,7 @@ function select_storage() {
   esac
 
   # Check for preset STORAGE variable
-  echo ${STORAGE:-}
-  echo $STORAGE
+  echo -e "Storage: '$STORAGE' "
   if [ "$CONTENT" = "rootdir" ] && [ -n "${STORAGE:-}" ]; then
     if pvesm status -content "$CONTENT" | awk 'NR>1 {print $1}' | grep -qx "$STORAGE"; then
       STORAGE_RESULT="$STORAGE"
