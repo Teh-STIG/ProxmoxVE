@@ -45,8 +45,8 @@ parse_arguments() {
     while getopts 'hvdncrbl:' OPTION; do
         case "$OPTION"  in
             -h) show_help 
-				exit 0 
-				;;
+				        exit 0 
+				        ;;
             -v)
                 VMID="$OPTARG"
                 ;;
@@ -59,9 +59,9 @@ parse_arguments() {
             -c)
                 CORE_COUNT="$OPTARG"
                 ;;
-			-o)
-				CPU_TYPE=""
-				;;
+			      -o)
+				        CPU_TYPE=""
+				        ;;
             -r)
                 RAM_SIZE="$OPTARG"
                 ;;
@@ -71,8 +71,9 @@ parse_arguments() {
             -l)
                 VLAN="$OPTARG"
                 ;;
-			-s)
-				STORAGE="$OPTARG"
+			      -s)
+				        STORAGE="$OPTARG"
+                ;;
             *)
                 echo "Unknown option: $1"
                 show_help
@@ -701,4 +702,3 @@ if [ "$START_VM" == "yes" ]; then
 fi
 #post_update_to_api "done" "none"
 msg_ok "Completed Successfully!\n"
-
