@@ -4,7 +4,84 @@
 # Author: thost96 (thost96) | Co-Author: michelroegl-brunner
 # License: MIT | https://github.com/community-scripts/ProxmoxVE/raw/main/LICENSE
 
-source /dev/stdin <<<$(curl -fsSL https://raw.githubusercontent.com/community-scripts/ProxmoxVE/main/misc/api.func)
+# Removing Error Handling posts to Community Scripts API, not needed for research project
+#source /dev/stdin <<<$(curl -fsSL https://raw.githubusercontent.com/community-scripts/ProxmoxVE/main/misc/api.func)
+
+# Help with error reporting
+set -o pipefail
+
+### The following modifications the community-script allow it to take arugments for rewriting important config decisions
+
+show_help() {
+    cat <<EOF
+Proxmox Cybersecurity Lab Automation Script (OPNsense Edition)
+
+Usage: $0 [OPTIONS]
+
+hvdncrbl
+OPTIONS:
+    -h			Show this help message
+    -v			VMID (Default: next available number)
+    -d			Disk Size without GB (Default: 10GB)
+    -n			Hostname (Default: VM-VMID)
+    -c			Core Count (Default: 2 cores)
+	-o			CPU Model (Default: Host, otherwise -o)
+    -r			Ram/Memory without MB (Default: 2048)
+    -b			Bridge (Default: vmbr0)
+    -l			VLAN (Default: No VLAN)
+	-s			Storage Location (Default: local-lvm)
+
+EXAMPLES:
+    # Set CPU Type to KVM64 (no argument), VMID, Disk Size (100GB), Ram (4096MB), Hostname. The rest are set as default.
+    $0 -o -v 999 -d 100 -r 4096 -n securevm
+	
+    # Set the Bridge, Disk Size and Hostname, VMID defaults to next available number and other variables set as default.
+    $0 -b 999 -d 100 -n securevm
+
+EOF
+}
+
+parse_arguments() {
+    while getopts 'hvdncrbl:' OPTION; do
+        case "$OPTION"  in
+            -h) show_help 
+				exit 0 
+				;;
+            -v)
+                VMID="$OPTARG"
+                ;;
+            -d)
+                DISK_SIZE="$OPTARG"
+                ;;
+            -n)
+                HN="$OPTARG"
+                ;;
+            -c)
+                CORE_COUNT="$OPTARG"
+                ;;
+			-o)
+				CPU_TYPE=""
+				;;
+            -r)
+                RAM_SIZE="$OPTARG"
+                ;;
+            -b)
+                BRG="$OPTARG"
+                ;;
+            -l)
+                VLAN="$OPTARG"
+                ;;
+			-s)
+				STORAGE="$OPTARG"
+            *)
+                echo "Unknown option: $1"
+                show_help
+                exit 1
+                ;;
+        esac
+    done
+}
+
 
 function header_info() {
   clear
@@ -24,8 +101,7 @@ RANDOM_UUID="$(cat /proc/sys/kernel/random/uuid)"
 METHOD=""
 NSAPP="docker-vm"
 var_os="debian"
-var_version="12"
-DISK_SIZE="10G"
+var_version="13"
 
 YW=$(echo "\033[33m")
 BL=$(echo "\033[36m")
@@ -64,14 +140,14 @@ THIN="discard=on,ssd=1,"
 set -e
 trap 'error_handler $LINENO "$BASH_COMMAND"' ERR
 trap cleanup EXIT
-trap 'post_update_to_api "failed" "INTERRUPTED"' SIGINT
-trap 'post_update_to_api "failed" "TERMINATED"' SIGTERM
+#trap 'post_update_to_api "failed" "INTERRUPTED"' SIGINT
+#trap 'post_update_to_api "failed" "TERMINATED"' SIGTERM
 function error_handler() {
   local exit_code="$?"
   local line_number="$1"
   local command="$2"
   local error_message="${RD}[ERROR]${CL} in line ${RD}$line_number${CL}: exit code ${RD}$exit_code${CL}: while executing command ${YW}$command${CL}"
-  post_update_to_api "failed" "${command}"
+  #post_update_to_api "failed" "${command}"
   echo -e "\n$error_message\n"
   cleanup_vmid
 }
@@ -102,17 +178,21 @@ function cleanup_vmid() {
 
 function cleanup() {
   popd >/dev/null
-  post_update_to_api "done" "none"
+  #post_update_to_api "done" "none"
   rm -rf $TEMP_DIR
 }
 
 TEMP_DIR=$(mktemp -d)
 pushd $TEMP_DIR >/dev/null
+
+# Removed to automate script with no user interaction
+: '
 if whiptail --backtitle "Proxmox VE Helper Scripts" --title "Docker VM" --yesno "This will create a New Docker VM. Proceed?" 10 58; then
   :
 else
   header_info && echo -e "${CROSS}${RD}User exited script${CL}\n" && exit
 fi
+'
 
 function msg_info() {
   local msg="$1"
@@ -183,6 +263,7 @@ function arch_check() {
   fi
 }
 
+
 function ssh_check() {
   if command -v pveversion >/dev/null 2>&1; then
     if [ -n "${SSH_CLIENT:+x}" ]; then
@@ -202,26 +283,62 @@ function exit-script() {
   exit
 }
 
+# Modified for the research topic's specific needs
 function default_settings() {
-  VMID=$(get_valid_nextid)
+  #-v|--vmid
+  if [ -z "$VMID" ]; then
+    VMID=$(get_valid_nextid)
+  fi  
   FORMAT=",efitype=4m"
-  MACHINE=""
-  DISK_CACHE=""
-  DISK_SIZE="10G"
-  HN="docker"
+  MACHINE=" -machine q35"
+  DISK_CACHE="cache=writethrough,"
+  #-d (Disk size)
+  if [ -z "$DISK_SIZE" ]; then
+    DISK_SIZE="10G"  
+  fi
+  #-n (Hostname)
+  if [ -z "$HN" ]; then
+    HN="VM-$VMID"  
+  fi
+  if [ -z "$HN" ]; then
+    HN="VM-$VMID"  
+  fi
+  #-o (CPU TYPE, default HOST, else KVM64)
+  if [ -z "$CPUT_TYPE" ]; then
+    CPU_TYPE=" -cpu host"  
+	else
+		CPU_TYPE="" 
+  fi  
   CPU_TYPE=""
-  CORE_COUNT="2"
-  RAM_SIZE="4096"
-  BRG="vmbr0"
+  #-c (Core Count)
+  if [ -z "$CORE_COUNT" ]; then
+    CORE_COUNT="2"
+  fi
+  #-r (Ram)
+  if [ -z "$RAM_SIZE" ]; then
+    RAM_SIZE="2048"
+  fi
+  #-b (Default bridge)
+  if [ -z "$BRG" ]; then
+    BRG="vmbr0"
+  fi
   MAC="$GEN_MAC"
-  VLAN=""
+  #-l (VLAN)
+  if [ -z "$VLAN" ]; then
+    VLAN=""
+  fi
+  #-s (Storage)
+  if [ -z "$STORAGE" ]; then
+    STORAGE="local-lvm"
+  fi
   MTU=""
   START_VM="yes"
   METHOD="default"
   echo -e "${CONTAINERID}${BOLD}${DGN}Virtual Machine ID: ${BGN}${VMID}${CL}"
   echo -e "${CONTAINERTYPE}${BOLD}${DGN}Machine Type: ${BGN}i440fx${CL}"
   echo -e "${DISKSIZE}${BOLD}${DGN}Disk Size: ${BGN}${DISK_SIZE}${CL}"
-  echo -e "${DISKSIZE}${BOLD}${DGN}Disk Cache: ${BGN}None${CL}"
+  echo -e "${DISKSIZE}${BOLD}${DGN}Disk Cache: ${BGN}Writethrough${CL}"
+  echo -e "${DISKSIZE}${BOLD}${DGN}VM Storage Location: ${BGN}$(STORAGE)${CL}"
   echo -e "${HOSTNAME}${BOLD}${DGN}Hostname: ${BGN}${HN}${CL}"
   echo -e "${OS}${BOLD}${DGN}CPU Model: ${BGN}KVM64${CL}"
   echo -e "${CPUCORE}${BOLD}${DGN}CPU Cores: ${BGN}${CORE_COUNT}${CL}"
@@ -427,12 +544,16 @@ function start_script() {
     advanced_settings
   fi
 }
+
 check_root
 arch_check
 pve_check
-ssh_check
-start_script
-post_to_api_vm
+#ssh_check
+#start_script
+#post_to_api_vm
+header_info
+echo -e "${DEFAULT}${BOLD}${BL}Using Default Settings${CL}"
+default_settings
 
 msg_info "Validating Storage"
 while read -r line; do
@@ -447,6 +568,8 @@ while read -r line; do
   STORAGE_MENU+=("$TAG" "$ITEM" "OFF")
 done < <(pvesm status -content images | awk 'NR>1')
 VALID=$(pvesm status -content images | awk 'NR>1')
+
+
 if [ -z "$VALID" ]; then
   msg_error "Unable to detect a valid storage location."
   exit
@@ -454,16 +577,22 @@ elif [ $((${#STORAGE_MENU[@]} / 3)) -eq 1 ]; then
   STORAGE=${STORAGE_MENU[0]}
 else
   while [ -z "${STORAGE:+x}" ]; do
-    STORAGE=$(whiptail --backtitle "Proxmox VE Helper Scripts" --title "Storage Pools" --radiolist \
-      "Which storage pool would you like to use for ${HN}?\nTo make a selection, use the Spacebar.\n" \
-      16 $(($MSG_MAX_LENGTH + 23)) 6 \
-      "${STORAGE_MENU[@]}" 3>&1 1>&2 2>&3)
+	# Force to always use local-lvm
+	STORAGE="local-lvm"
+	#STORAGE=$(whiptail --backtitle "Proxmox VE Helper Scripts" --title "Storage Pools" --radiolist \
+    #  "Which storage pool would you like to use for ${HN}?\nTo make a selection, use the Spacebar.\n" \
+    #  16 $(($MSG_MAX_LENGTH + 23)) 6 \
+    #  "${STORAGE_MENU[@]}" 3>&1 1>&2 2>&3)
   done
 fi
+
 msg_ok "Using ${CL}${BL}$STORAGE${CL} ${GN}for Storage Location."
 msg_ok "Virtual Machine ID is ${CL}${BL}$VMID${CL}."
-msg_info "Retrieving the URL for the Debian 12 Qcow2 Disk Image"
-URL="https://cloud.debian.org/images/cloud/bookworm/latest/debian-12-nocloud-$(dpkg --print-architecture).qcow2"
+
+# Modified to use Deb13 rather than Deb12
+msg_info "Retrieving the URL for the Debian 13 Qcow2 Disk Image"
+exit 0
+URL="https://cloud.debian.org/images/cloud/trixie/latest/debian-13-nocloud-$(dpkg --print-architecture).qcow2"
 sleep 2
 msg_ok "${CL}${BL}${URL}${CL}"
 curl -f#SL -o "$(basename "$URL")" "$URL"
@@ -502,10 +631,10 @@ if ! command -v virt-customize &>/dev/null; then
   msg_ok "Installed libguestfs-tools successfully"
 fi
 
-msg_info "Adding Docker and Docker Compose Plugin to Debian 12 Qcow2 Disk Image"
-virt-customize -q -a "${FILE}" --install qemu-guest-agent,apt-transport-https,ca-certificates,curl,gnupg,software-properties-common,lsb-release >/dev/null &&
+msg_info "Adding Docker and Docker Compose Plugin to Debian 13 Qcow2 Disk Image"
+  virt-customize -q -a "${FILE}" --install qemu-guest-agent,apt-transport-https,ca-certificates,curl,gnupg,software-properties-common,lsb-release >/dev/null &&
   virt-customize -q -a "${FILE}" --run-command "mkdir -p /etc/apt/keyrings && curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg" >/dev/null &&
-  virt-customize -q -a "${FILE}" --run-command "echo 'deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian bookworm stable' > /etc/apt/sources.list.d/docker.list" >/dev/null &&
+  virt-customize -q -a "${FILE}" --run-command "echo 'deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian trixie stable' > /etc/apt/sources.list.d/docker.list" >/dev/null &&
   virt-customize -q -a "${FILE}" --run-command "apt-get update -qq && apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin" >/dev/null &&
   virt-customize -q -a "${FILE}" --run-command "systemctl enable docker" >/dev/null &&
   virt-customize -q -a "${FILE}" --hostname "${HN}" >/dev/null &&
@@ -530,6 +659,7 @@ qm set $VMID \
   -serial0 socket >/dev/null
 qm resize $VMID scsi0 8G >/dev/null
 qm set $VMID --agent enabled=1 >/dev/null
+
 
 DESCRIPTION=$(
   cat <<EOF
@@ -569,5 +699,6 @@ if [ "$START_VM" == "yes" ]; then
   qm start $VMID
   msg_ok "Started Docker VM"
 fi
-post_update_to_api "done" "none"
+#post_update_to_api "done" "none"
 msg_ok "Completed Successfully!\n"
+
