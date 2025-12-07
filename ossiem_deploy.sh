@@ -523,6 +523,7 @@ function advanced_settings() {
 function start_script() {
   if (whiptail --backtitle "Proxmox VE Helper Scripts" --title "SETTINGS" --yesno "Use Default Settings?" --no-button Advanced 10 58); then
     header_info
+    echo -e "${INFO}${BOLD}${BL}You might want to go grab a cup of coffee, this takes over 10 minutes on a good day!${CL}"
     echo -e "${DEFAULT}${BOLD}${BL}Using Default Settings${CL}"
     default_settings
   else
