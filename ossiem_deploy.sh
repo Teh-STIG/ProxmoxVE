@@ -49,36 +49,20 @@ if [ $# -eq 0 ]; then
 fi
 
 while getopts ":h:v:d:n:c:or:b:l:s:i:k:" opt; do
-  case $opt in
-    h) show_help
-        exit 0
-        ;;
-    v) VMID=$OPTARG
-        ;;
-    d) DISK_SIZE=$OPTARG
-        ;;
-    n) HN=$OPTARG
-        ;;
-    c) CORE_COUNT=$OPTARG
-        ;;
-    o) CPU_TYPE=""
-        ;;
-    r) RAM_SIZE=$OPTARG
-        ;;
-    b) BRG=$OPTARG
-        ;;
-    l) VLAN=$OPTARG
-        ;;
-    s) STORAGE=$OPTARG
-        ;;
-    i) COMMAND_FILE_PATH=$OPTARG
-        ;;
-    k) SSH_KEY=$OPTARG
-        ;;
-    *) echo "Unknown option: $1"
-        show_help
-        exit 1
-        ;;
+  case "${opt}" in
+    h) show_help exit 0 ;;
+    v) VMID=$OPTARG ;;
+    d) DISK_SIZE=$OPTARG ;;
+    n) HN=$OPTARG ;;
+    c) CORE_COUNT=$OPTARG ;;
+    o) CPU_TYPE="" ;;
+    r) RAM_SIZE=$OPTARG ;;
+    b) BRG=$OPTARG ;;
+    l) VLAN=$OPTARG ;;
+    s) STORAGE=$OPTARG ;;
+    i) COMMAND_FILE_PATH=$OPTARG ;;
+    k) SSH_KEY=$OPTARG ;;
+    *) echo "Unknown option: $1" show_help exit 1 ;;
   esac
 done
 
