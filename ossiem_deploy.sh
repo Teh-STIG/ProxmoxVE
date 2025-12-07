@@ -30,7 +30,6 @@ OPTIONS:
     -l                  VLAN (Default: No VLAN)
     -s                  Storage Location (Default: local-lvm)
 	  -i                  Path to Config file that virt-customize will use to provision VM
-    -k                  SSH Key Path
 
 EXAMPLES:
     # Set CPU Type to KVM64 (no argument), VMID, Disk Size (100GB), Ram (4096MB), >
@@ -61,7 +60,7 @@ while getopts ":h:v:d:n:c:or:b:l:s:i:k:" opt; do
     l) VLAN=$OPTARG ;;
     s) STORAGE=$OPTARG ;;
     i) COMMAND_FILE_PATH=$OPTARG ;;
-    k) SSH_KEY=$OPTARG ;;
+    #k) SSH_KEY=$OPTARG ;;
     *) echo "Unknown option: $1" show_help exit 1 ;;
   esac
 done
@@ -314,9 +313,9 @@ function default_settings() {
   if [ -z "$STORAGE" ]; then
     STORAGE="local-lvm"
   fi
-  if [ -z "$SSH_KEY" ]; then
-    SSH_KEY="/root/.ssh/id_rsa.pub"
-  fi  
+  #if [ -z "$SSH_KEY" ]; then
+  #  SSH_KEY="/root/.ssh/id_rsa.pub"
+  #fi  
   MTU=""
   START_VM="yes"
   METHOD="default"
@@ -628,7 +627,7 @@ msg_info "Adding Docker and Docker Compose Plugin to Debian 13 Qcow2 Disk Image"
   virt-customize -q -a "${FILE}" --hostname "${HN}" >/dev/null &&
   virt-customize -q -a "${FILE}" --run-command "echo -n > /etc/machine-id" >/dev/null
   virt-customize -q -a "${FILE}" --run-command "apt-get install -y openssh-server"
-  virt-customize -q -a "${FILE}" --ssh-inject "root:file:${SSH_KEY}"
+  #virt-customize -q -a "${FILE}" --ssh-inject "root:file:${SSH_KEY}"
   virt-customize -q -a "${FILE}" --commands-from-file "${COMMAND_FILE_PATH}"
   
 msg_ok "Added Docker and Docker Compose Plugin to Debian 12 Qcow2 Disk Image successfully"
