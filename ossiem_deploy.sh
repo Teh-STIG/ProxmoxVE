@@ -29,7 +29,8 @@ OPTIONS:
     -b                  Bridge (Default: vmbr0)
     -l                  VLAN (Default: No VLAN)
     -s                  Storage Location (Default: local-lvm)
-	-i                  Install Config file (uses
+	  -i                  Path to Config file that virt-customize will use to provision VM
+    -k                  SSH Key Path
 
 EXAMPLES:
     # Set CPU Type to KVM64 (no argument), VMID, Disk Size (100GB), Ram (4096MB), >
@@ -70,13 +71,16 @@ while getopts ":h:v:d:n:c:or:b:l:s:" opt; do
         ;;
     s) STORAGE=$OPTARG
         ;;
+    i) COMMAND_FILE_PATH=$OPTARG
+        ;;
+    k) SSH_KEY=$OPTARG
+        ;;
     *) echo "Unknown option: $1"
         show_help
         exit 1
         ;;
   esac
 done
-
 
 function header_info() {
   clear
@@ -326,6 +330,9 @@ function default_settings() {
   if [ -z "$STORAGE" ]; then
     STORAGE="local-lvm"
   fi
+  if [ -z "$SSH_KEY" ]; then
+    SSH_KEY="/root/.ssh/id_rsa.pub"
+  fi  
   MTU=""
   START_VM="yes"
   METHOD="default"
@@ -343,6 +350,7 @@ function default_settings() {
   echo -e "${VLANTAG}${BOLD}${DGN}VLAN: ${BGN}${VLAN}${CL}"
   echo -e "${DEFAULT}${BOLD}${DGN}Interface MTU Size: ${BGN}Default${CL}"
   echo -e "${GATEWAY}${BOLD}${DGN}Start VM when completed: ${BGN}yes${CL}"
+  echo -e "${RAMSIZE}${BOLD}${DGN}Using SSH Key: ${BGN}${SSH_KEY}${CL}"
   echo -e "${CREATING}${BOLD}${DGN}Creating a Docker VM using the above default settings${CL}"
 }
 
@@ -635,7 +643,8 @@ msg_info "Adding Docker and Docker Compose Plugin to Debian 13 Qcow2 Disk Image"
   virt-customize -q -a "${FILE}" --hostname "${HN}" >/dev/null &&
   virt-customize -q -a "${FILE}" --run-command "echo -n > /etc/machine-id" >/dev/null
   virt-customize -q -a "${FILE}" --run-command "apt-get install -y openssh-server"
-  virt-customize -q -a "${FILE}" --ssh-inject root
+  virt-customize -q -a "${FILE}" --ssh-inject:file:"${SSH_KEY}"
+  virt-customize -q -a "${FILE}" --command-from-file "${COMMAND_FILE_PATH}"
   
 msg_ok "Added Docker and Docker Compose Plugin to Debian 12 Qcow2 Disk Image successfully"
 
