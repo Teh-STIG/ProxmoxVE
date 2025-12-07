@@ -627,7 +627,7 @@ msg_info "Adding Docker and Docker Compose Plugin to Debian 13 Qcow2 Disk Image"
   virt-customize -q -a "${FILE}" --hostname "${HN}" >/dev/null &&
   virt-customize -q -a "${FILE}" --run-command "echo -n > /etc/machine-id" >/dev/null
   virt-customize -q -a "${FILE}" --run-command "apt-get install -y openssh-server"
-  virt-customize -q -a "${FILE}" --ssh-inject:file:"${SSH_KEY}"
+  virt-customize -q -a "${FILE}" --ssh-inject "root:file:${SSH_KEY}"
   virt-customize -q -a "${FILE}" --command-from-file "${COMMAND_FILE_PATH}"
   
 msg_ok "Added Docker and Docker Compose Plugin to Debian 12 Qcow2 Disk Image successfully"
