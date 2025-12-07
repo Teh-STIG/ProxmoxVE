@@ -48,7 +48,7 @@ if [ $# -eq 0 ]; then
         exit 1
 fi
 
-while getopts ":h:v:d:n:c:or:b:l:s:" opt; do
+while getopts ":h:v:d:n:c:or:b:l:s:i:k:" opt; do
   case $opt in
     h) show_help
         exit 0
