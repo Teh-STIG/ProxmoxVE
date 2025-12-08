@@ -286,12 +286,11 @@ function default_settings() {
     HN="VM-$VMID"  
   fi
   #-o (CPU TYPE, default HOST, else KVM64)
-  if [ -z "$CPUT_TYPE" ]; then
+  if [ -z "$CPU_TYPE" ]; then
     CPU_TYPE=" -cpu host"  
 	else
 		CPU_TYPE="" 
   fi  
-  CPU_TYPE=""
   #-c (Core Count)
   if [ -z "$CORE_COUNT" ]; then
     CORE_COUNT="2"
@@ -335,6 +334,7 @@ function default_settings() {
   echo -e "${GATEWAY}${BOLD}${DGN}Start VM when completed: ${BGN}yes${CL}"
   echo -e "${RAMSIZE}${BOLD}${DGN}Using SSH Key: ${BGN}${SSH_KEY}${CL}"
   echo -e "${CREATING}${BOLD}${DGN}Creating a Docker VM using the above default settings${CL}"
+  echo -e "${ADVANCED}${BOLD}${DGN}DEBUG: ${BGN}${CPU_TYPE}${CL}"
 }
 
 function advanced_settings() {
